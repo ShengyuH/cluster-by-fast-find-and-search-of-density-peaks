@@ -15,21 +15,21 @@ function [cluster_lables, center_idxs,rho,delta] = cluster_dp(dist, para,data,nu
 
 
 %% Estimate dc
-disp('Estimating dc...');
-percent = para.percent;
-N = size(dist,1);
-position = round(N*(N-1)*percent/100);
-tri_u = triu(dist,1);
-sda = sort(tri_u(tri_u~=0));
-dc = sda(position);
-fprintf('Computing dc with original method: %12.6f\n', dc);
-clear sda; clear tri_u;
+% disp('Estimating dc...');
+% percent = para.percent;
+% N = size(dist,1);
+% position = round(N*(N-1)*percent/100);
+% tri_u = triu(dist,1);
+% sda = sort(tri_u(tri_u~=0));
+% dc = sda(position);
+% fprintf('Computing dc with original method: %12.6f\n', dc);
+% clear sda; clear tri_u;
 
 %% new method to estimate dc
-% disp('Estimating dc...');
-% STD=std2(data);
-% dc=(4/(3*size(dist,1)))^(1/5)*STD;
-% fprintf('Computing dc with new method: %12.6f\n', dc);
+disp('Estimating dc...');
+STD=std2(data);
+dc=(4/(3*size(dist,1)))^(1/5)*STD;
+fprintf('Computing dc with new method: %12.6f\n', dc);
 
 %% Compute rho(density)
 disp('Computing rho...');
@@ -171,7 +171,6 @@ end
         center_idxs=center_idxs(newindex);
     end
     box off
-    c=1;
 end
 
 raw_cluster_lables = cluster_lables;

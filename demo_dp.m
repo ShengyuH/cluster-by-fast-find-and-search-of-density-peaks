@@ -36,12 +36,12 @@ clc
 % end
 
 %% read UCI dataset
-xx=load('S3.dat');
-data=xx(:,2:3);
-[h,w]=size(data);
-for i=1:w
-   data(:,i)=mapminmax(data(:,i)',0,1)'; 
-end
+% xx=load('S3.dat');
+% data=xx(:,2:3);
+% [h,w]=size(data);
+% for i=1:w
+%    data(:,i)=mapminmax(data(:,i)',0,1)'; 
+% end
 
 %% read normalImage or ENVIImage
 %filename='file.tif';
@@ -50,32 +50,32 @@ end
 %I=single(imread(filename));
 
 %ENVIImageFile
-% I=read_ENVIimagefile;
-% 
-% %histogram equalization
-% [h,w,dim]=size(I);
-% M=h*w;
-% data=reshape(I,h*w,dim);
-% % for i=1:dim
+I=read_ENVIimagefile;
+
+%histogram equalization
+[h,w,dim]=size(I);
+M=h*w;
+data=reshape(I,h*w,dim);
+% for i=1:dim
 %    data(:,i)=mapminmax(data(:,i)',0,1)'; 
 %    img=single(HistogramEqualization(reshape(data(:,i),h,w)));
 %    data(:,i)=mapminmax(reshape(img,h*w,1)',0,1)';
 % end
 
-%% dimension reduction
-% [coeff,score,latent]=pca(data);
-% latent=latent./sum(latent);
-% sum=0;
-% i=0;
-% while (sum<0.95)
-%     i=i+1;
-%     sum=sum+latent(i);
-% end
-% data=score(:,1:i);
-% dim=size(data,2);
-% for i=1:dim
-%    data(:,i)=mapminmax(data(:,i)',0,1)'; 
-% end
+% dimension reduction
+[coeff,score,latent]=pca(data);
+latent=latent./sum(latent);
+sum=0;
+i=0;
+while (sum<0.95)
+    i=i+1;
+    sum=sum+latent(i);
+end
+data=score(:,1:i);
+dim=size(data,2);
+for i=1:dim
+   data(:,i)=mapminmax(data(:,i)',0,1)'; 
+end
 
 %% plot dist
 % figure(2)
@@ -95,7 +95,6 @@ clear dist
 %cluster_lables=kmeans(data,5);
 %show the result
 % figure(2)
-% % %brighten(-0.85)
 % cmap = colormap;
 % %nclust=5;
 % nclust = length(center_idxs);
@@ -123,14 +122,14 @@ clear dist
 % cluster_3=find(cluster_lables==3);
 
 %show image
-% figure(3)
-% I1=reshape(cluster_lables,h,w);
-% imagesc(I1);
-% colorbar
-% t=0:0:0;
-% set(gca,'xtick',t)
-% set(gca,'ytick',t)
-t=tabulate(cluster_lables);
+figure(3)
+I1=reshape(cluster_lables,h,w);
+imagesc(I1);
+colorbar
+t=0:0:0;
+set(gca,'xtick',t)
+set(gca,'ytick',t)
+%t=tabulate(cluster_lables);
 
     
     
