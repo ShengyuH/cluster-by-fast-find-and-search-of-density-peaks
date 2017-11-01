@@ -1,6 +1,6 @@
 %% demo of clustering by finding density peaks
-clear all
 close all
+clear all
 clc
 
 %% simulate data
@@ -50,8 +50,17 @@ clc
 %I=single(imread(filename));
 
 %ENVIImageFile
-I=read_ENVIimagefile;
+%I=read_ENVIimagefile;
+%I=salinasA_corrected;
 
+pavia=load('/Users/henry/Desktop/Major Revision/Pavia_University/Pavia_University/PaviaU.mat')
+row=460
+column=60
+I=pavia.paviaU(row:row+120,column:column+120,:);
+pavia=load('/Users/henry/Desktop/Major Revision/Pavia_University/Pavia_University/PaviaU_gt.mat')
+gt=pavia.paviaU_gt(row:row+120,column:column+120);
+
+fprintf('Data loaded\n')
 %histogram equalization
 [h,w,dim]=size(I);
 M=h*w;
@@ -89,8 +98,35 @@ dist=pdist2(data,data);
 para.method = 'gaussian';
 para.percent = 2;
 num_MSE=2.5;
-[cluster_lables, center_idxs,rho,delta] = cluster_dp(dist, para,data,num_MSE);
+[cluster_lables1, center_idxs,rho,delta] = cluster_dp(dist, para,data,num_MSE);
+[cluster_lables2, center_idxs,rho,delta] = cluster_dp_old(dist, para,num_MSE);
 clear dist
+
+
+%% show result
+colorbar
+figure('NumberTitle', 'off', 'Name', 'result_new')
+I1=reshape(cluster_lables1,h,w);
+imagesc(I1);
+colorbar
+t=0:0:0;
+set(gca,'xtick',t)
+set(gca,'ytick',t)
+
+colorbar
+figure('NumberTitle', 'off', 'Name', 'result_old')
+I1=reshape(cluster_lables2,h,w);
+imagesc(I1);
+colorbar
+t=0:0:0;
+set(gca,'xtick',t)
+set(gca,'ytick',t)
+
+figure('NumberTitle', 'off', 'Name', 'Ground Truth')
+colorbar
+imagesc(gt)
+
+
 
 %cluster_lables=kmeans(data,5);
 %show the result
@@ -121,15 +157,7 @@ clear dist
 % cluster_2=find(cluster_lables==2);
 % cluster_3=find(cluster_lables==3);
 
-%show image
-figure(3)
-I1=reshape(cluster_lables,h,w);
-imagesc(I1);
-colorbar
-t=0:0:0;
-set(gca,'xtick',t)
-set(gca,'ytick',t)
-%t=tabulate(cluster_lables);
+
 
     
     

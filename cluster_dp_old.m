@@ -1,4 +1,4 @@
-function [cluster_lables, center_idxs,rho,delta] = cluster_dp(dist, para,data,num_MSE)
+function [cluster_lables, center_idxs,rho,delta] = cluster_dp_old(dist, para,num_MSE)
 %% Input and Output
 % INPUT :
 % dist : A nCases*nCases matrix. each dist(i, j) represents the distance
@@ -14,12 +14,17 @@ function [cluster_lables, center_idxs,rho,delta] = cluster_dp(dist, para,data,nu
 % center_idxs    : a nCluster vector contains the center indexes.
 
 
-
-% new method to estimate dc
+%% Estimate dc
 disp('Estimating dc...');
-STD=std2(data);
-dc=(4/(3*size(dist,1)))^(1/5)*STD;
-fprintf('Computing dc with new method: %12.6f\n', dc);
+percent = para.percent;
+N = size(dist,1);
+position = round(N*(N-1)*percent/100);
+tri_u = triu(dist,1);
+sda = sort(tri_u(tri_u~=0));
+dc = sda(position);
+fprintf('Computing dc with original method: %12.6f\n', dc);
+clear sda; clear tri_u;
+
 
 %% Compute rho(density)
 disp('Computing rho...');
@@ -51,11 +56,9 @@ end
 delta(ordrho(1)) = max(delta(:));
 delta=delta+1;
 
-
 %% normalize delta and rho
 %rho=mapminmax(rho',0.0000001,1)';
 %delta=mapminmax(delta',0.000001,1)';
-
 
 %% %fit (rho-delta)  y=a*x^b;
 [paras,S]=polyfit(log(delta),log(rho),1);
@@ -70,7 +73,7 @@ disp(['The Mean Square Residuals is:',num2str(MSE_delta)]);
 
 
 %% Decision graph, choose min_rho and min_delta
-figure('NumberTitle', 'off', 'Name', 'decision_new')
+figure(1)
 plot(rho(:),delta(:),'o','MarkerSize',2,'MarkerFaceColor','k','MarkerEdgeColor','k');
 hold on
 C=sortrows([rho,estDelta],1);
@@ -139,7 +142,6 @@ for i=1:NCLUST
    hold on
    plot(rho(center_idxs(i)),delta(center_idxs(i)),'o','MarkerSize',8,'MarkerFaceColor',cmap(ic,:),'MarkerEdgeColor',cmap(ic,:));
 end
-
 %% Assignment
 % raw assignment
     disp('Assigning data-points into clusters...');
@@ -165,4 +167,25 @@ end
         center_idxs=center_idxs(newindex);
     end
     box off
+end
+
+%raw_cluster_lables = cluster_lables;
+%% find and cut off halo region
+% disp('Cut off halo regions...');
+% for i = 1:length(center_idxs)
+%     tmp_idx = find(raw_cluster_lables==i);
+%     tmp_dist = dist(tmp_idx,:);
+%     tmp_dist(:,tmp_idx) = max(dist(:));
+%     tmp_rho = rho(tmp_idx);
+%     tmp_lables = raw_cluster_lables(tmp_idx);
+%     tmp_border = find(sum(tmp_dist<dc,2)>0);
+%     if ~isempty(tmp_border)
+%         rho_b = max(tmp_rho(tmp_border));
+%         halo_idx = rho(tmp_idx) < rho_b;
+%         tmp_lables(halo_idx) = 0;
+%         %lable equals to 0 means it's in the halo region
+%         cluster_lables(tmp_idx) = tmp_lables;
+%     end
+% end
+
 end
